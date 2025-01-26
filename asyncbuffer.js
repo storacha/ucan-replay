@@ -56,7 +56,7 @@ export default class AsyncBuffer {
       if (this._buffer.length >= this._batchLength) {
         const nextItems = this._buffer.slice(0, this._batchLength)
         this._buffer = this._buffer.slice(this._batchLength)
-        if (this._fullBufferResolve != null) {
+        if (this._fullBufferResolve != null && this._buffer.length < this.maxSize) {
           this._fullBufferResolve()
         }
         yield(nextItems)

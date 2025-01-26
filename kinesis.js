@@ -112,11 +112,16 @@ async function * consumeTimeRange(consumerARN, shardId, startTime, endTime, kine
     },
   })
 
-  let sequenceNumber
   for (;;) {
     
-    let subscribeResponse = await kinesisClient.send(subscribeToShardCommand)
-
+    
+    let subscribeResponse 
+    try {
+      subscribeResponse = await kinesisClient.send(subscribeToShardCommand)
+    } catch (err) {
+      console.log("warning error in setting up subscription", err)
+      continue
+    }
     if (subscribeResponse.EventStream === undefined) {
       throw new Error("unable to subscribe to consumer")
     }
@@ -137,19 +142,18 @@ async function * consumeTimeRange(consumerARN, shardId, startTime, endTime, kine
           return
         }
         yield records.Records
-        sequenceNumber = records.Records.at(-1).SequenceNumber
+        subscribeToShardCommand = new SubscribeToShardCommand({
+          ConsumerARN: consumerARN,
+          ShardId: shardId,
+          StartingPosition: { // StartingPosition
+            Type: ShardIteratorType.AFTER_SEQUENCE_NUMBER,
+            SequenceNumber: records.Records.at(-1).SequenceNumber
+          },
+        })
       }
     } catch (err) {
       console.log("warning: err processing event stream", err)
     }
-    subscribeToShardCommand = new SubscribeToShardCommand({
-      ConsumerARN: consumerARN,
-      ShardId: shardId,
-      StartingPosition: { // StartingPosition
-        Type: ShardIteratorType.AFTER_SEQUENCE_NUMBER,
-        SequenceNumber: sequenceNumber
-      },
-    })
   }
 }
 

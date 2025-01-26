@@ -1,0 +1,42 @@
+{
+  "name": "@web3-storage/w3infra-ucan-replay",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node ucan-replay.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.515.0",
+    "@aws-sdk/client-firehose": "^3.654.0",
+    "@aws-sdk/client-kinesis": "^3.654.0",
+    "@aws-sdk/client-s3": "^3.658.0",
+    "@aws-sdk/client-sqs": "^3.515.0",
+    "@aws-sdk/util-dynamodb": "^3.515.0",
+    "@date-fns/utc": "^2.1.0",
+    "@repeaterjs/repeater": "^3.0.6",
+    "@sentry/serverless": "^7.74.1",
+    "@ucanto/interface": "^10.0.1",
+    "@ucanto/server": "^10.0.0",
+    "@web3-storage/capabilities": "^17.1.1",
+    "big.js": "^6.2.1",
+    "date-fns": "^4.1.0",
+    "lru-cache": "^11.0.0",
+    "multiformats": "^13.1.0",
+    "p-retry": "^6.2.0",
+    "stripe": "^14.2.0",
+    "uint8arrays": "^4.0.6"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.2.1",
+    "c8": "^8.0.1",
+    "csv-stringify": "^6.4.6",
+    "dotenv": "^16.4.5",
+    "entail": "^2.1.1",
+    "p-all": "^5.0.0",
+    "testcontainers": "^10.7.1"
+  },
+  "engines": {
+    "node": ">=16.15"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

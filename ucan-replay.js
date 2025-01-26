@@ -19,7 +19,6 @@ const endDate = new UTCDate(process.argv[3])
 const endTime = endOfDay(endDate)
 const days = eachDayOfInterval({start: startDate, end: endDate})
          
-const abilities = ["store/add", "space/blob/add", "web3.storage/blob/allocate", "web3.storage/blob/accept", "upload/add", "store/remove", "blob/remove", "upload/remove", "provider/add", "aggregate/offer", "aggregate/accept"]
 /**
  * @import {_Record} from "@aws-sdk/client-kinesis"
  */
@@ -55,9 +54,7 @@ if (process.argv.length === 5) {
   }
   console.log(handleStream)
 } else {
-  if (process.argv.length <= 5 || process.argv[5] !== 'local') {
-    await clearS3Days('stream-log-store-prod-0', 'us-west-2', days)
-  }
+  await clearS3Days('stream-log-store-prod-0', 'us-west-2', days)
   
   handleStream = 
   /**
@@ -77,17 +74,10 @@ if (process.argv.length > 5 && process.argv[5] === 'local') {
         const filePath = path.join(absoluteWriteDir, dirent.name);
         let fileContent = await fsPromises.readFile(filePath, 'utf-8');
         const record = JSON.parse(fileContent);
-        if (record.type === "receipt" && abilities.includes(record.value.att[0].can)) {
-          if (record.value?.att[0]?.can === "upload/add") {
-            delete record.out?.ok?.shards
-            fileContent = JSON.stringify(record)
-          }
-          const base64Data = Buffer.from(fileContent, 'utf-8').toString('base64');
-          const uint8Array = Uint8Array.from(Buffer.from(base64Data, 'base64'));
-          /** @type {_Record} */
-          const data = { ApproximateArrivalTimestamp: new Date(record.ts), Data: uint8Array, SequenceNumber: dirent.name}
-          yield [data]
-        }
+        const uint8Array = Uint8Array.from(Buffer.from(fileContent, 'utf-8'));
+        /** @type {_Record} */
+        const data = { ApproximateArrivalTimestamp: new Date(record.ts), Data: uint8Array, SequenceNumber: dirent.name}
+        yield [data]
         await fsPromises.rm(filePath)
       }
     }

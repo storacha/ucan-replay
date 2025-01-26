@@ -7,6 +7,7 @@ import {
 } from "@aws-sdk/client-firehose";
 
 
+const abilities = ["store/add", "space/blob/add", "web3.storage/blob/allocate", "web3.storage/blob/accept", "upload/add", "store/remove", "blob/remove", "upload/remove", "provider/add", "aggregate/offer", "aggregate/accept"]
 
 /**
  * @param {string} firehoseName
@@ -39,12 +40,22 @@ function chunkArray(array, chunkSize) {
 async function putRecordsRecursiveSize(records, chunkSize, split) {
   const recordChunks = chunkArray(records, chunkSize);
   for (const chunk of recordChunks) {
-    const formattedRecords = chunk.map((record) => {
-      const payload = Buffer.from(record.Data, "base64").toString("utf-8");
+    const formattedRecords = chunk.map((rawRecord) => {
+      const payload = Buffer.from(rawRecord.Data, "base64").toString("utf-8");
+      const record = JSON.parse(payload)
+      return { payload, record }
+    }).filter(({record}) => (record.type === "receipt" && abilities.includes(record.value.att[0].can))).map(({payload, record}) => {
+      if (record.value?.att[0]?.can === "upload/add") {
+        delete record.out?.ok?.shards
+        payload = JSON.stringify(record)
+      }
       return {
         Data: new TextEncoder().encode(payload), // Add a newline character to separate records
       };
     });
+    if (formattedRecords.length == 0) {
+      continue
+    }
     // Prepare the Firehose record
     const putRecordBatchCommand = new PutRecordBatchCommand({
       DeliveryStreamName: firehoseName,

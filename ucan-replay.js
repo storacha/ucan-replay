@@ -24,7 +24,7 @@ const days = eachDayOfInterval({start: startDate, end: endDate})
  */
 
 /** @type {AsyncBuffer<import("@aws-sdk/client-kinesis")._Record>} */
-const buffer = new AsyncBuffer(100)
+const buffer = new AsyncBuffer(100, 10000000)
 
 /** @type {(AsyncGenerator<_Record[]>) => Promise<void>)} */
 var handleStream
